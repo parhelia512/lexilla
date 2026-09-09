@@ -60,6 +60,10 @@ unsigned int SpaceCount(const char* lineBuffer) noexcept {
 	return spaces;
 }
 
+constexpr bool EmptyLine(std::string_view line) noexcept {
+	return line.find_first_not_of("\n\r") == std::string_view::npos;
+}
+
 bool KeywordAtChar(const char* lineBuffer, const char* startComment, const WordList &keywords) noexcept {
 	if (lineBuffer == nullptr || startComment <= lineBuffer)
 		return false;
@@ -102,7 +106,7 @@ void ColouriseYAMLLine(
 
 		if ((parentLineState&YAML_STATE_MASK) == YAML_STATE_TEXT || (parentLineState&YAML_STATE_MASK) == YAML_STATE_TEXT_PARENT) {
 			const unsigned int parentIndentAmount = parentLineState&(~YAML_STATE_MASK);
-			if (indentAmount > parentIndentAmount) {
+			if ((indentAmount > parentIndentAmount) || EmptyLine(lineBuffer)) {
 				styler.SetLineState(currentLine, YAML_STATE_TEXT | parentIndentAmount);
 				styler.ColourTo(endPos, SCE_YAML_TEXT);
 				return;
