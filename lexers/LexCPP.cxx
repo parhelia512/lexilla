@@ -180,14 +180,16 @@ public:
 		digitsLeft = 0;
 		outerState = state;
 		escapeSetValid = &setNoneNumeric;
+		constexpr int lengthU = 9;
+		constexpr int lengthxu = 5;
 		if (nextChar == 'U') {
-			digitsLeft = 9;
+			digitsLeft = lengthU;
 			escapeSetValid = &setHexDigits;
 		} else if (nextChar == 'u') {
-			digitsLeft = 5;
+			digitsLeft = lengthxu;
 			escapeSetValid = &setHexDigits;
 		} else if (nextChar == 'x') {
-			digitsLeft = 5;
+			digitsLeft = lengthxu;
 			escapeSetValid = &setHexDigits;
 		} else if (setOctDigits.Contains(nextChar)) {
 			digitsLeft = 3;
@@ -688,7 +690,7 @@ public:
 		const int firstSubStyle = subStyles.FirstAllocated();
 		if (firstSubStyle >= 0) {
 			const int lastSubStyle = subStyles.LastAllocated();
-			if (((style >= firstSubStyle) && (style <= (lastSubStyle))) ||
+			if (((style >= firstSubStyle) && (style <= lastSubStyle)) ||
 				((style >= firstSubStyle + inactiveFlag) && (style <= (lastSubStyle + inactiveFlag)))) {
 				int styleActive = style;
 				if (style > lastSubStyle) {
@@ -1294,6 +1296,9 @@ void SCI_METHOD LexerCPP::Lex(Sci_PositionU startPos, Sci_Position length, int i
 					sc.SetState(styleBeforeTaskMarker|activitySet);
 					styleBeforeTaskMarker = SCE_C_DEFAULT;
 				}
+				break;
+			default:
+				break;
 		}
 
 		if (sc.atLineEnd && !atLineEndBeforeSwitch) {
@@ -1629,7 +1634,7 @@ void SCI_METHOD LexerCPP::Fold(Sci_PositionU startPos, Sci_Position length, int 
 			lineStartNext = styler.LineStart(lineCurrent+1);
 			levelCurrent = levelNext;
 			levelMinCurrent = levelCurrent;
-			if (atEOL && (i == static_cast<Sci_PositionU>(styler.Length()-1))) {
+			if (atEOL && ((i+1) == static_cast<Sci_PositionU>(styler.Length()))) {
 				// There is an empty line at end of file so give it same level and empty
 				styler.SetLevel(lineCurrent, FoldLevelForCurrent(levelCurrent) | SC_FOLDLEVELWHITEFLAG);
 			}
